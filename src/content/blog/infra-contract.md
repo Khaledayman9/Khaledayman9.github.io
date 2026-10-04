@@ -1,12 +1,15 @@
 ---
 title: "infra-contract: Putting Infrastructure Under a Contract"
 date: 2026-09-08
+updatedDate: 2026-10-05
 excerpt: "Valid Terraform can still be infrastructure you never wanted — a public database, an overly broad IAM policy, an unsupported architecture. infra-contract is a small, version-controlled way to make the actual rules explicit for people, CI, and AI agents alike."
 coverImage: ../../assets/blog/infra-contract-validation-workflow.png
 coverImageAlt: "infra-contract validation workflow: a developer or AI agent's Terraform change is evaluated against a contract before a CLI, MCP, or CI gate reaches a deployment decision"
 logo: "https://raw.githubusercontent.com/khaleddeissa/infra-contract/main/assets/logo.svg"
 logoAlt: "infra-contract logo"
 references:
+  - label: "Release notes — v0.1.4"
+    url: "https://github.com/khaleddeissa/infra-contract/releases/tag/v0.1.4"
   - label: "GitHub — khaleddeissa/infra-contract"
     url: "https://github.com/khaleddeissa/infra-contract"
   - label: "PyPI — infra-contract"
@@ -24,6 +27,8 @@ But there's a gap in that story. A Terraform configuration can be completely val
 I came across this exact gap while researching and building [ops-pilot](https://github.com/khaleddeissa/ops-pilot), an agent system that reads Terraform and telemetry to reason about infrastructure incidents — this surfaced from reading and thinking through the problem during development, not from deploying anything or pointing an agent at a real cloud account. Once an AI agent is reading infrastructure, the next question is obvious: what happens the day an agent starts _writing_ it? An agent can produce Terraform that is syntactically perfect and still wrong for the environment it's about to touch. Reviewing every generated line by hand doesn't scale, and it's exactly the kind of judgment call that shouldn't live only in one engineer's head.
 
 That's the problem [**infra-contract**](https://github.com/khaleddeissa/infra-contract) is built around: give humans and AI agents the same, independently enforced answer to "is this infrastructure allowed?" — before it's merged or deployed.
+
+**Updated for [v0.1.4](https://github.com/khaleddeissa/infra-contract/releases/tag/v0.1.4), released October 3, 2026.** This maintenance release adds package keywords, Python classifiers, and repository/documentation/issue links; updates Apache-2.0 license metadata and license-file packaging; and refreshes dependencies and release tooling. The contract schema and validation workflow described below remain the same.
 
 ## Valid isn't the same as acceptable
 
@@ -117,6 +122,12 @@ infra-contract check path/to/terraform
 
 That path is explicitly treated as lower-confidence — source scanning can't see what Terraform actually intends to change the way a plan can, and the tool doesn't pretend otherwise.
 
+To include change-risk reporting alongside validation, use:
+
+```bash
+infra-contract plan tfplan.json
+```
+
 Not every violation deserves to block a deployment, so severity is configurable end to end, from `info` up through `critical`:
 
 ```bash
@@ -162,7 +173,7 @@ print(result.to_dict())
 
 ```yaml
 # GitHub Actions
-- uses: khaleddeissa/infra-contract@v0.1.3
+- uses: khaleddeissa/infra-contract@v0.1.4
   with:
     plan: tfplan.json
     fail-on: high
@@ -172,7 +183,7 @@ print(result.to_dict())
 ```bash
 # Docker
 docker run --rm -v "$PWD:/workspace:ro" -w /workspace \
-  ghcr.io/khaleddeissa/infra-contract:v0.1.3 \
+  ghcr.io/khaleddeissa/infra-contract:v0.1.4 \
   check --contract infra-contract.yaml .
 ```
 
@@ -259,7 +270,7 @@ It's worth reading the generated contract before trusting it as an actual bounda
 If you'd rather not install anything locally, the same CLI is published as a container image on GHCR, built as a multi-stage image that runs as a non-root user and is intentionally CLI-only, with no HTTP port to manage:
 
 ```bash
-docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.3
+docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.4
 ```
 
 See the [package on GHCR](https://github.com/khaleddeissa/infra-contract/pkgs/container/infra-contract) for available tags. And if CI is where you'd rather enforce this, the action is published on the [GitHub Marketplace](https://github.com/marketplace/actions/infrastructure-contract) — pin it to a released tag or commit SHA rather than a floating branch:
@@ -276,14 +287,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: khaleddeissa/infra-contract@v0.1.3
+      - uses: khaleddeissa/infra-contract@v0.1.4
         with:
           plan: tfplan.json
           fail-on: high
           comment-on-pr: true
 ```
 
-The project is currently at **v0.1.3**, its latest stable release, with v0.1.0, v0.1.1 and v0.1.2 as earlier tags along the way. The repository's `examples/` directory has complete starting points for a basic Terraform setup, a production service, a RAG application, the Python API, the GitHub Action, Docker, an MCP client, human-approval gating, and the `explain`/`fix` workflow.
+The current release is **v0.1.4**. The documentation now links directly to a [quickstart with `init`](https://github.com/khaleddeissa/infra-contract/tree/v0.1.4/examples/quickstart-init), alongside examples for a basic Terraform setup, a production service, a RAG application, the Python API, the GitHub Action, Docker, an MCP client, human-approval gating, and the `explain`/`fix` workflow.
+
+Two examples are especially useful before adding a CI gate: [multi-region drift](https://github.com/khaleddeissa/infra-contract/tree/v0.1.4/examples/multi-region-drift) covers a resource outside the approved `cloud.regions` list, while [unknown resource types](https://github.com/khaleddeissa/infra-contract/tree/v0.1.4/examples/unknown-resource-types) shows a plan mixing modeled resources with types the engine has no opinion on.
 
 ## What it deliberately doesn't do
 

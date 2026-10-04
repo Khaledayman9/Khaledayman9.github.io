@@ -1,0 +1,131 @@
+---
+const stats = [
+  {
+    provider: 'pypi',
+    label: 'PyPI',
+    name: 'llm-refract',
+    count: '6,770',
+    period: 'Total downloads',
+    href: 'https://pepy.tech/projects/llm-refract',
+    source: 'View on pepy.tech',
+  },
+  {
+    provider: 'npm',
+    label: 'npm',
+    name: '@llm-refract/sdk',
+    count: '477',
+    period: 'Downloads · last 30 days',
+    href: 'https://www.npmjs.com/package/@llm-refract/sdk',
+    source: 'View on npm',
+  },
+];
+---
+
+<section class="downloads" aria-label="llm-refract package downloads">
+  <div class="downloads-heading">
+    <h2>Package downloads</h2>
+    <span>From the community</span>
+  </div>
+  <div class="downloads-grid">
+    {stats.map((stat) => (
+      <a class="download-card" href={stat.href} data-download-provider={stat.provider}>
+        <span class="registry">{stat.label}<span aria-hidden="true">↗</span></span>
+        <span class="package-name">{stat.name}</span>
+        <div class="reading" aria-live="polite" aria-atomic="true">
+          <span class="download-count" data-download-count>{stat.count}</span>
+          <span class="download-period" data-download-period>{stat.period}</span>
+          <span class="download-status" data-download-status>Recorded Oct 5, 2026</span>
+        </div>
+        <span class="source">{stat.source} <span aria-hidden="true">→</span></span>
+      </a>
+    ))}
+  </div>
+  <p class="downloads-note">Counts refresh on each visit as sources update. PyPI totals may be rounded. Includes CI downloads.</p>
+  <noscript><p class="downloads-note">Enable JavaScript for current counts, or follow the source links above.</p></noscript>
+</section>
+
+<script>
+  // Shields exposes Pepy's public total as JSON without requiring a private API key.
+  // Only its count is used; the visual presentation belongs to this component.
+  const endpoints = {
+    pypi: 'https://img.shields.io/pepy/dt/llm-refract.json',
+    npm: 'https://api.npmjs.org/downloads/point/last-month/@llm-refract/sdk',
+  };
+
+  async function refreshDownloads(card: HTMLElement) {
+    if (card.dataset.downloadStarted) return;
+    card.dataset.downloadStarted = 'true';
+    const provider = card.dataset.downloadProvider as keyof typeof endpoints;
+    const count = card.querySelector<HTMLElement>('[data-download-count]')!;
+    const period = card.querySelector<HTMLElement>('[data-download-period]')!;
+    const status = card.querySelector<HTMLElement>('[data-download-status]')!;
+    status.textContent = 'Updating · saved Oct 5, 2026';
+    try {
+      const response = await fetch(endpoints[provider], { signal: AbortSignal.timeout(8000) });
+      if (!response.ok) throw new Error('Download statistics unavailable');
+      const data = await response.json();
+      if (provider === 'pypi') {
+        // Reject Shields error messages (which can arrive with HTTP 200).
+        if (data.isError || typeof data.message !== 'string' ||
+            !/^\d+(?:[,.]\d+)*(?:\s?[kmbt])?$/i.test(data.message)) {
+          throw new Error('Invalid PyPI count');
+        }
+        count.textContent = data.message;
+        status.textContent = 'Latest from pepy.tech';
+      } else {
+        if (data.package !== '@llm-refract/sdk' || !Number.isSafeInteger(data.downloads) || data.downloads < 0 ||
+            typeof data.start !== 'string' || typeof data.end !== 'string' ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(data.start) || !/^\d{4}-\d{2}-\d{2}$/.test(data.end)) {
+          throw new Error('Invalid npm count');
+        }
+        const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+        const range = `${dateFormat.format(new Date(data.start))} – ${dateFormat.format(new Date(data.end))}`;
+        count.textContent = new Intl.NumberFormat('en-US').format(data.downloads);
+        period.title = range;
+        status.textContent = range;
+      }
+      card.dataset.downloadState = 'current';
+    } catch {
+      status.textContent = 'Saved Oct 5, 2026 · refresh unavailable';
+      card.dataset.downloadState = 'saved';
+    }
+  }
+
+  function setupDownloads() {
+    document.querySelectorAll<HTMLElement>('[data-download-provider]').forEach(refreshDownloads);
+  }
+
+  setupDownloads();
+  document.addEventListener('astro:page-load', setupDownloads);
+</script>
+
+<style>
+  .downloads { margin-top: 2rem; }
+  .downloads-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.85rem; }
+  h2 { font-size: 0.95rem; }
+  .downloads-heading > span { font-size: 0.75rem; color: var(--text-muted); }
+  .downloads-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; }
+  .download-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.3rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: linear-gradient(145deg, var(--accent-wash), transparent 75%), var(--bg-elevated);
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+  .download-card:hover { border-color: var(--accent-dim); }
+  .registry { display: flex; justify-content: space-between; font-family: var(--font-display); font-weight: 600; color: var(--accent); }
+  .registry > span { color: var(--text-muted); }
+  .package-name { margin-top: 0.2rem; font-size: 0.8rem; color: var(--text-muted); overflow-wrap: anywhere; }
+  .reading { display: flex; flex-direction: column; flex: 1; margin: 1.2rem 0; }
+  .download-count { font-family: var(--font-display); font-size: clamp(2.4rem, 6vw, 3.3rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.055em; font-variant-numeric: tabular-nums; }
+  .download-period { margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted); }
+  .download-status { margin-top: 0.45rem; font-size: 0.7rem; color: var(--text-muted); }
+  .source { padding-top: 0.8rem; border-top: 1px solid var(--line); font-size: 0.75rem; color: var(--accent); }
+  .downloads-note { margin: 0.8rem 0 0; font-size: 0.72rem; color: var(--text-muted); }
+  @media (max-width: 420px) {
+    .downloads-grid { grid-template-columns: 1fr; }
+    .downloads-heading > span { display: none; }
+  }
+</style>

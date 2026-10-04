@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import RefractDownloads from '../../components/RefractDownloads.astro';
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import '../../styles/mermaid.css';
@@ -36,8 +37,15 @@ const dateFmt = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long
         }
         {post.data.title}
       </h1>
-      <p class="post-date">{dateFmt.format(post.data.date)}</p>
+      <p class="post-date">
+        <time datetime={post.data.date.toISOString()}>{dateFmt.format(post.data.date)}</time>
+        {post.data.updatedDate && (
+          <span> · Updated <time datetime={post.data.updatedDate.toISOString()}>{dateFmt.format(post.data.updatedDate)}</time></span>
+        )}
+      </p>
     </header>
+
+    {post.id === 'llm-refract' && <RefractDownloads />}
 
     {
       post.data.coverImage && (typeof post.data.coverImage === 'string' ? (
@@ -230,6 +238,74 @@ const dateFmt = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long
     font-size: 1.25rem;
     margin: 2.4em 0 0.9em;
     color: var(--text);
+  }
+
+  .prose :global(h3) {
+    font-size: 1.08rem;
+    margin: 1.8em 0 0.8em;
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+
+  .prose :global(th:first-child) {
+    width: 38%;
+  }
+
+  .prose :global(th),
+  .prose :global(td) {
+    padding: 0.8em 0.65em;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .prose :global(th) {
+    color: var(--accent);
+    background: var(--bg-elevated);
+  }
+
+  .prose :global(figure) {
+    margin: 1.8em 0;
+  }
+
+  .prose :global(video) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-elevated);
+  }
+
+  .prose :global(figcaption) {
+    margin-top: 0.7em;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .prose :global(details) {
+    margin: 1.2em 0;
+    padding: 1em;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .prose :global(summary) {
+    cursor: pointer;
+    color: var(--accent);
+  }
+
+  .prose :global(summary:focus-visible),
+  .prose :global(video:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 
   .prose :global(strong) {
