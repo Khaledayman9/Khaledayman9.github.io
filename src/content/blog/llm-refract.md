@@ -24,6 +24,10 @@ references:
     url: "https://www.npmjs.com/package/@llm-refract/sdk"
   - label: "GHCR — server, CLI, and Inspector container"
     url: "https://github.com/khaleddeissa/llm-refract/pkgs/container/llm-refract"
+  - label: "GitHub Action — regression setup and current availability"
+    url: "https://github.com/khaleddeissa/llm-refract/blob/main/docs/usage/ci.md"
+  - label: "GitHub Marketplace — supplied Action link (see availability note above)"
+    url: "https://github.com/marketplace/actions/refract-execution-regression"
 ---
 
 Your AI assistant gives the wrong answer. Was the document wrong? Did a tool fail? Did the model ignore the evidence? And why did this request take twice as long as yesterday's?
