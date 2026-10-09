@@ -1,15 +1,15 @@
 ---
 title: "infra-contract: Putting Infrastructure Under a Contract"
 date: 2026-09-08
-updatedDate: 2026-10-05
+updatedDate: 2026-10-09
 excerpt: "Valid Terraform can still be infrastructure you never wanted — a public database, an overly broad IAM policy, an unsupported architecture. infra-contract is a small, version-controlled way to make the actual rules explicit for people, CI, and AI agents alike."
 coverImage: ../../assets/blog/infra-contract-validation-workflow.png
 coverImageAlt: "infra-contract validation workflow: a developer or AI agent's Terraform change is evaluated against a contract before a CLI, MCP, or CI gate reaches a deployment decision"
 logo: "https://raw.githubusercontent.com/khaleddeissa/infra-contract/main/assets/logo.svg"
 logoAlt: "infra-contract logo"
 references:
-  - label: "Release notes — v0.1.4"
-    url: "https://github.com/khaleddeissa/infra-contract/releases/tag/v0.1.4"
+  - label: "Release notes — v0.1.5"
+    url: "https://github.com/khaleddeissa/infra-contract/releases/tag/v0.1.5"
   - label: "GitHub — khaleddeissa/infra-contract"
     url: "https://github.com/khaleddeissa/infra-contract"
   - label: "PyPI — infra-contract"
@@ -28,7 +28,7 @@ I came across this exact gap while researching and building [ops-pilot](https://
 
 That's the problem [**infra-contract**](https://github.com/khaleddeissa/infra-contract) is built around: give humans and AI agents the same, independently enforced answer to "is this infrastructure allowed?" — before it's merged or deployed.
 
-**Updated for [v0.1.4](https://github.com/khaleddeissa/infra-contract/releases/tag/v0.1.4), released October 3, 2026.** This maintenance release adds package keywords, Python classifiers, and repository/documentation/issue links; updates Apache-2.0 license metadata and license-file packaging; and refreshes dependencies and release tooling. The contract schema and validation workflow described below remain the same.
+**Updated for [v0.1.5](https://github.com/khaleddeissa/infra-contract/releases/tag/v0.1.5), released October 9, 2026.** This release adds CLI and SDK documentation, updates package versions, and disables Dependabot in the repository.
 
 ## Valid isn't the same as acceptable
 
@@ -173,7 +173,7 @@ print(result.to_dict())
 
 ```yaml
 # GitHub Actions
-- uses: khaleddeissa/infra-contract@v0.1.4
+- uses: khaleddeissa/infra-contract@v0.1.5
   with:
     plan: tfplan.json
     fail-on: high
@@ -183,7 +183,7 @@ print(result.to_dict())
 ```bash
 # Docker
 docker run --rm -v "$PWD:/workspace:ro" -w /workspace \
-  ghcr.io/khaleddeissa/infra-contract:v0.1.4 \
+  ghcr.io/khaleddeissa/infra-contract:v0.1.5 \
   check --contract infra-contract.yaml .
 ```
 
@@ -270,7 +270,7 @@ It's worth reading the generated contract before trusting it as an actual bounda
 If you'd rather not install anything locally, the same CLI is published as a container image on GHCR, built as a multi-stage image that runs as a non-root user and is intentionally CLI-only, with no HTTP port to manage:
 
 ```bash
-docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.4
+docker pull ghcr.io/khaleddeissa/infra-contract:v0.1.5
 ```
 
 See the [package on GHCR](https://github.com/khaleddeissa/infra-contract/pkgs/container/infra-contract) for available tags. And if CI is where you'd rather enforce this, the action is published on the [GitHub Marketplace](https://github.com/marketplace/actions/infrastructure-contract) — pin it to a released tag or commit SHA rather than a floating branch:
@@ -287,16 +287,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: khaleddeissa/infra-contract@v0.1.4
+      - uses: khaleddeissa/infra-contract@v0.1.5
         with:
           plan: tfplan.json
           fail-on: high
           comment-on-pr: true
 ```
 
-The current release is **v0.1.4**. The documentation now links directly to a [quickstart with `init`](https://github.com/khaleddeissa/infra-contract/tree/v0.1.4/examples/quickstart-init), alongside examples for a basic Terraform setup, a production service, a RAG application, the Python API, the GitHub Action, Docker, an MCP client, human-approval gating, and the `explain`/`fix` workflow.
+The current release is **v0.1.5**. The documentation now links directly to a [quickstart with `init`](https://github.com/khaleddeissa/infra-contract/tree/v0.1.5/examples/quickstart-init), alongside examples for a basic Terraform setup, a production service, a RAG application, the Python API, the GitHub Action, Docker, an MCP client, human-approval gating, and the `explain`/`fix` workflow.
 
-Two examples are especially useful before adding a CI gate: [multi-region drift](https://github.com/khaleddeissa/infra-contract/tree/v0.1.4/examples/multi-region-drift) covers a resource outside the approved `cloud.regions` list, while [unknown resource types](https://github.com/khaleddeissa/infra-contract/tree/v0.1.4/examples/unknown-resource-types) shows a plan mixing modeled resources with types the engine has no opinion on.
+Two examples are especially useful before adding a CI gate: [multi-region drift](https://github.com/khaleddeissa/infra-contract/tree/v0.1.5/examples/multi-region-drift) covers a resource outside the approved `cloud.regions` list, while [unknown resource types](https://github.com/khaleddeissa/infra-contract/tree/v0.1.5/examples/unknown-resource-types) shows a plan mixing modeled resources with types the engine has no opinion on.
 
 ## What it deliberately doesn't do
 

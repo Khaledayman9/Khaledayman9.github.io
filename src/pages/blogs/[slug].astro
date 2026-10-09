@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import RefractDownloads from '../../components/RefractDownloads.astro';
+import PackageDownloads from '../../components/PackageDownloads.astro';
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import '../../styles/mermaid.css';
@@ -45,7 +45,7 @@ const dateFmt = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long
       </p>
     </header>
 
-    {post.id === 'llm-refract' && <RefractDownloads />}
+    {(post.id === 'llm-refract' || post.id === 'infra-contract') && <PackageDownloads project={post.id} />}
 
     {
       post.data.coverImage && (typeof post.data.coverImage === 'string' ? (

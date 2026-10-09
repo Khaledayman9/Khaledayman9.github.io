@@ -1,7 +1,7 @@
 ---
 title: "llm-refract: Record, Understand, and Improve Your AI Applications"
 date: 2026-09-20
-updatedDate: 2026-10-05
+updatedDate: 2026-10-09
 excerpt: "See every step your AI takes, find expensive or slow calls, try another model, and catch regressions before shipping. A complete tour of llm-refract's provider integrations, Inspector, replay, evaluation, and local-to-production workflows."
 coverImage: https://raw.githubusercontent.com/khaleddeissa/llm-refract/40869d859cf98510a5f0e6a9b1f8ec8cc384fc6f/assets/Inspector_Overview.PNG
 coverImageAlt: "Current llm-refract Inspector showing a returns assistant's cost, latency, token usage, comparison controls, and retrieval-to-generation graph"
@@ -36,7 +36,7 @@ I built [**llm-refract**](https://github.com/khaleddeissa/llm-refract) to make t
 
 Think of it as a flight recorder and an experiment workspace for AI applications. One recording can follow a simple model call, a RAG pipeline that retrieves documents before answering, a tool-using agent, or a workflow involving several agents. You can inspect the evidence, create a new branch, and measure whether a change actually helped.
 
-This updated tour covers the repository's **0.1.4 source feature set**. Published Python, npm, and container versions may lag the checkout; the [development guide](https://github.com/khaleddeissa/llm-refract/blob/main/docs/development.md) explains how to build the current source.
+This updated tour covers the repository's **v0.1.5 source feature set**. Published Python, npm, and container versions may lag the checkout; the [development guide](https://github.com/khaleddeissa/llm-refract/blob/main/docs/development.md) explains how to build the current source.
 
 ## Watch the workflow
 
